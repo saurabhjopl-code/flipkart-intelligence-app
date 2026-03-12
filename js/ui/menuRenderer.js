@@ -4,124 +4,53 @@ import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
 import { setPage, renderCurrentPage } from "../binder.js";
 
+let activeMenuItem = null;
+
 export function renderSidebar(){
 
-    const sidebar=document.getElementById("sidebar");
-    sidebar.innerHTML="";
+    const sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = "";
 
-    sidebar.appendChild(title("Flipkart Intelligence"));
+    const title = document.createElement("div");
+    title.className = "sidebar-title";
+    title.innerText = "Flipkart Intelligence";
 
-    sidebar.appendChild(item("Home","HOME"));
+    sidebar.appendChild(title);
 
-    sidebar.appendChild(section("CDR",[
-        ["Campaign ROI","CDR_ROI"],
-        ["Campaign Spend Trend","CDR_SPEND"],
-        ["Campaign Efficiency","CDR_EFF"],
-        ["Budget Allocation","CDR_BUDGET"]
-    ]));
+    sidebar.appendChild(menuItem("Home","HOME"));
 
-    sidebar.appendChild(section("CFR",[
-        ["SKU ROI","CFR_SKU_ROI"],
-        ["Hero SKU","CFR_HERO"],
-        ["Ad Waste","CFR_WASTE"],
-        ["Ad Dependency","CFR_DEP"]
-    ]));
-
-    sidebar.appendChild(section("CKR",[
-        ["Keyword ROI","CKR_ROI"],
-        ["Keyword Efficiency","CKR_EFF"],
-        ["Keyword Opportunity","CKR_OPP"],
-        ["Negative Keywords","CKR_NEG"]
-    ]));
-
-    sidebar.appendChild(section("PPR",[
-        ["Placement ROI","PPR_ROI"],
-        ["Placement CTR","PPR_CTR"],
-        ["Placement Conversion","PPR_CONV"]
-    ]));
-
-    sidebar.appendChild(section("GMV",[
-        ["Hero Products","GMV_HERO"],
-        ["Category Performance","GMV_CAT"],
-        ["Return Risk","GMV_RETURN"],
-        ["Growth Momentum","GMV_GROWTH"]
-    ]));
+    sidebar.appendChild(menuItem("CDR","CDR"));
+    sidebar.appendChild(menuItem("CFR","CFR"));
+    sidebar.appendChild(menuItem("CKR","CKR"));
+    sidebar.appendChild(menuItem("PPR","PPR"));
+    sidebar.appendChild(menuItem("GMV","GMV"));
 
 }
 
+function menuItem(label,page){
 
-function title(text){
+    const el = document.createElement("div");
 
-    const el=document.createElement("div");
-    el.className="sidebar-title";
-    el.innerText=text;
+    el.className = "sidebar-item";
+    el.innerText = label;
 
-    return el;
+    el.onclick = () => {
 
-}
+        if(activeMenuItem)
+            activeMenuItem.style.background="";
 
+        el.style.background="#e9f2ff";
 
-function item(label,page){
+        activeMenuItem = el;
 
-    const el=document.createElement("div");
-    el.className="sidebar-item";
-    el.innerText=label;
+        setPage(page);
 
-    el.onclick=()=>navigate(page);
+        const filtered = applyFilters(dataStore);
 
-    return el;
-
-}
-
-
-function section(name,children){
-
-    const wrap=document.createElement("div");
-
-    const header=document.createElement("div");
-    header.className="sidebar-item sidebar-section";
-    header.innerHTML=`${name} <span class="arrow">▶</span>`;
-
-    const container=document.createElement("div");
-    container.style.display="none";
-
-    header.onclick=()=>{
-
-        const open=container.style.display==="block";
-
-        container.style.display=open?"none":"block";
-
-        header.querySelector(".arrow").innerText=open?"▶":"▼";
+        renderCurrentPage(filtered);
 
     };
 
-    children.forEach(c=>{
-
-        const el=document.createElement("div");
-
-        el.className="sidebar-item submenu";
-        el.innerText=c[0];
-
-        el.onclick=()=>navigate(c[1]);
-
-        container.appendChild(el);
-
-    });
-
-    wrap.appendChild(header);
-    wrap.appendChild(container);
-
-    return wrap;
-
-}
-
-
-function navigate(page){
-
-    setPage(page);
-
-    const filtered=applyFilters(dataStore);
-
-    renderCurrentPage(filtered);
+    return el;
 
 }
