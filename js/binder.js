@@ -5,101 +5,71 @@ import { buildAdsSummary } from "./home/adsSummaryEngine.js";
 
 import { renderCardGrid } from "./ui/cardRenderer.js";
 import { renderChartContainer } from "./ui/chartContainer.js";
+import { renderTable } from "./ui/tableRenderer.js";
 
 import { buildGmvSalesNetChart } from "./charts/gmvSalesNetChart.js";
 import { buildCdrSpendRevenueChart } from "./charts/cdrSpendRevenueChart.js";
 
+import { buildCampaignRoiReport } from "./reports/cdr/campaignRoiReport.js";
 
 
-export async function renderHome(filteredData) {
 
-    console.log("Rendering Home dashboard...");
+export async function renderHome(data) {
 
     const app = document.getElementById("app");
 
-    if (!app) {
-        console.error("App container missing");
-        return;
-    }
-
     app.innerHTML = "";
 
-
-
     const dashboard = document.createElement("div");
-    dashboard.className = "dashboard-container";
 
 
 
-    // GMV SUMMARY
-    const gmvSummaryData = buildGmvSummary(filteredData.GMV);
-
-    const gmvSummarySection = document.createElement("div");
-    gmvSummarySection.className = "summary-section";
-
-    const gmvTitle = document.createElement("h2");
-    gmvTitle.innerText = "GMV Summary";
-
-    gmvSummarySection.appendChild(gmvTitle);
-
-    const gmvCards = renderCardGrid(gmvSummaryData);
-
-    gmvSummarySection.appendChild(gmvCards);
-
-    dashboard.appendChild(gmvSummarySection);
+    const gmvCards = renderCardGrid(buildGmvSummary(data.GMV));
+    dashboard.appendChild(gmvCards);
 
 
 
-    // GMV CHART
-
-    const gmvChartData = buildGmvSalesNetChart(filteredData.GMV);
-
-    const gmvChartSection = renderChartContainer(
+    const gmvChart = renderChartContainer(
         "GMV vs Net Sales",
-        "gmv-chart",
-        gmvChartData
+        "gmvChart",
+        buildGmvSalesNetChart(data.GMV)
     );
 
-    dashboard.appendChild(gmvChartSection);
+    dashboard.appendChild(gmvChart);
 
 
 
-    // ADS SUMMARY
-
-    const adsSummaryData = buildAdsSummary(filteredData.CDR);
-
-    const adsSummarySection = document.createElement("div");
-
-    adsSummarySection.className = "summary-section";
-
-    const adsTitle = document.createElement("h2");
-
-    adsTitle.innerText = "Ads Summary";
-
-    adsSummarySection.appendChild(adsTitle);
-
-    const adsCards = renderCardGrid(adsSummaryData);
-
-    adsSummarySection.appendChild(adsCards);
-
-    dashboard.appendChild(adsSummarySection);
+    const adsCards = renderCardGrid(buildAdsSummary(data.CDR));
+    dashboard.appendChild(adsCards);
 
 
 
-    // ADS CHART
-
-    const adsChartData = buildCdrSpendRevenueChart(filteredData.CDR);
-
-    const adsChartSection = renderChartContainer(
+    const adsChart = renderChartContainer(
         "Daily Ad Spend vs Ad Revenue",
-        "ads-chart",
-        adsChartData
+        "adsChart",
+        buildCdrSpendRevenueChart(data.CDR)
     );
 
-    dashboard.appendChild(adsChartSection);
+    dashboard.appendChild(adsChart);
 
 
 
     app.appendChild(dashboard);
+
+}
+
+
+
+export function renderCampaignReport(data) {
+
+    const app = document.getElementById("app");
+
+    app.innerHTML = "";
+
+    const report = buildCampaignRoiReport(data.CDR);
+
+    const table = renderTable(report.columns, report.rows);
+
+    app.appendChild(table);
 
 }
