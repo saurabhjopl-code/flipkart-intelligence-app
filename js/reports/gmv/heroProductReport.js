@@ -1,0 +1,1 @@
+// Placeholder file for heroProductReport.js

@@ -1,0 +1,1 @@
+// Placeholder file for adWasteReport.js
