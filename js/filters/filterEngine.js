@@ -11,7 +11,7 @@ export function applyFilters(dataStore) {
 
     for (const sheet in dataStore) {
 
-        filtered[sheet] = applySheetFilters(dataStore[sheet], filters, sheet);
+        filtered[sheet] = filterSheet(dataStore[sheet], sheet, filters);
 
     }
 
@@ -19,52 +19,42 @@ export function applyFilters(dataStore) {
 
 }
 
+function filterSheet(rows, sheetName, filters) {
 
+    if (!rows) return [];
 
-function applySheetFilters(rows, filters, sheetName) {
+    return rows.filter(r => {
 
-    if (!rows || rows.length === 0) return [];
+        if (!accountPass(r, filters)) return false;
 
-    const result = [];
+        if (!datePass(r, sheetName, filters)) return false;
 
-    for (const row of rows) {
+        return true;
 
-        if (!passAccountFilter(row, filters)) continue;
-
-        if (!passDateFilter(row, filters, sheetName)) continue;
-
-        result.push(row);
-
-    }
-
-    return result;
+    });
 
 }
 
-
-
-function passAccountFilter(row, filters) {
+function accountPass(row, filters) {
 
     if (filters.ACC === "ALL") return true;
 
-    if (!row["ACC"]) return true;
+    if (!row.ACC) return true;
 
-    return row["ACC"] === filters.ACC;
+    return row.ACC === filters.ACC;
 
 }
 
+function datePass(row, sheet, filters) {
 
+    let field = null;
 
-function passDateFilter(row, filters, sheetName) {
+    if (sheet === "GMV") field = "Order Date";
+    if (sheet === "CDR") field = "Date";
 
-    let dateField = null;
+    if (!field) return true;
 
-    if (sheetName === "GMV") dateField = "Order Date";
-    if (sheetName === "CDR") dateField = "Date";
-
-    if (!dateField) return true;
-
-    const raw = row[dateField];
+    const raw = row[field];
 
     if (!raw) return false;
 
