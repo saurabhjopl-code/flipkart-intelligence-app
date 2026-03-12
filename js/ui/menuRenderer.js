@@ -1,6 +1,6 @@
 // js/ui/menuRenderer.js
 
-import { renderHome, renderCampaignReport } from "../binder.js";
+import { renderHome, renderCampaignReport, renderSkuRoiReport } from "../binder.js";
 import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
 
@@ -40,7 +40,20 @@ export function renderSidebar() {
 
     ]));
 
-    menu.appendChild(buildSection("CFR", []));
+    menu.appendChild(buildSection("CFR", [
+
+        {
+            label: "SKU ROI",
+            action: () => {
+
+                const filtered = applyFilters(dataStore);
+                renderSkuRoiReport(filtered);
+
+            }
+        }
+
+    ]));
+
     menu.appendChild(buildSection("CKR", []));
     menu.appendChild(buildSection("PPR", []));
     menu.appendChild(buildSection("GMV", []));
