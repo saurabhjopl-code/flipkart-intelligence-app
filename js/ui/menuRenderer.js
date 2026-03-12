@@ -11,60 +11,82 @@ export function renderSidebar() {
     sidebar.innerHTML = "";
 
     const title = document.createElement("div");
-
     title.className = "sidebar-title";
-
     title.innerText = "Flipkart Intelligence";
 
     sidebar.appendChild(title);
 
-
-
     const menu = document.createElement("div");
-
     menu.className = "sidebar-menu";
 
-
-
-    const home = createItem("Home", () => {
+    menu.appendChild(buildItem("Home", () => {
 
         const filtered = applyFilters(dataStore);
-
         renderHome(filtered);
 
-    });
+    }));
 
+    menu.appendChild(buildSection("CDR", [
 
+        {
+            label: "Campaign ROI",
+            action: () => {
 
-    const cdr = createItem("CDR", () => {
+                const filtered = applyFilters(dataStore);
+                renderCampaignReport(filtered);
 
-        const filtered = applyFilters(dataStore);
+            }
+        }
 
-        renderCampaignReport(filtered);
+    ]));
 
-    });
-
-
-
-    menu.appendChild(home);
-    menu.appendChild(cdr);
+    menu.appendChild(buildSection("CFR", []));
+    menu.appendChild(buildSection("CKR", []));
+    menu.appendChild(buildSection("PPR", []));
+    menu.appendChild(buildSection("GMV", []));
 
     sidebar.appendChild(menu);
 
 }
 
-
-
-function createItem(text, handler) {
+function buildItem(label, action) {
 
     const el = document.createElement("div");
 
     el.className = "sidebar-item";
+    el.innerText = label;
 
-    el.innerText = text;
-
-    el.onclick = handler;
+    el.onclick = action;
 
     return el;
+
+}
+
+function buildSection(title, children) {
+
+    const wrap = document.createElement("div");
+
+    const header = document.createElement("div");
+    header.className = "sidebar-item";
+    header.innerText = title;
+
+    wrap.appendChild(header);
+
+    children.forEach(child => {
+
+        const sub = document.createElement("div");
+
+        sub.className = "sidebar-item";
+        sub.style.paddingLeft = "40px";
+
+        sub.innerText = child.label;
+
+        sub.onclick = child.action;
+
+        wrap.appendChild(sub);
+
+    });
+
+    return wrap;
 
 }
