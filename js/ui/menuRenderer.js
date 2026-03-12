@@ -1,5 +1,9 @@
 // js/ui/menuRenderer.js
 
+import { renderHome, renderCampaignReport } from "../binder.js";
+import { dataStore } from "../core/dataStore.js";
+import { applyFilters } from "../filters/filterEngine.js";
+
 export function renderSidebar() {
 
     const sidebar = document.getElementById("sidebar");
@@ -7,35 +11,60 @@ export function renderSidebar() {
     sidebar.innerHTML = "";
 
     const title = document.createElement("div");
+
     title.className = "sidebar-title";
+
     title.innerText = "Flipkart Intelligence";
 
     sidebar.appendChild(title);
 
+
+
     const menu = document.createElement("div");
+
     menu.className = "sidebar-menu";
 
-    const items = [
-        "Home",
-        "CDR",
-        "CFR",
-        "PPR",
-        "CKR",
-        "GMV"
-    ];
 
-    for (const item of items) {
 
-        const el = document.createElement("div");
+    const home = createItem("Home", () => {
 
-        el.className = "sidebar-item";
+        const filtered = applyFilters(dataStore);
 
-        el.innerText = item;
+        renderHome(filtered);
 
-        menu.appendChild(el);
+    });
 
-    }
+
+
+    const cdr = createItem("CDR", () => {
+
+        const filtered = applyFilters(dataStore);
+
+        renderCampaignReport(filtered);
+
+    });
+
+
+
+    menu.appendChild(home);
+    menu.appendChild(cdr);
 
     sidebar.appendChild(menu);
+
+}
+
+
+
+function createItem(text, handler) {
+
+    const el = document.createElement("div");
+
+    el.className = "sidebar-item";
+
+    el.innerText = text;
+
+    el.onclick = handler;
+
+    return el;
 
 }
