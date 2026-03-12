@@ -1,36 +1,17 @@
 // js/filters/filterEngine.js
 
-import { dataStore } from "../core/dataStore.js";
-import { renderCurrentPage } from "../binder.js";
+import { getFilters } from "./filterState.js";
+import { parseDDMMYYYY } from "../core/dateEngine.js";
 
-export function applyFilters(data){
+export function applyFilters(dataStore) {
 
-    const acc = document.getElementById("filterAcc")?.value;
-    const start = document.getElementById("filterStart")?.value;
-    const end = document.getElementById("filterEnd")?.value;
+    const filters = getFilters();
 
     const filtered = {};
 
-    for(const sheet in data){
+    for (const sheet in dataStore) {
 
-        filtered[sheet] = data[sheet].filter(row => {
-
-            // Account filter
-            if(acc && acc !== "All Accounts" && row["ACC"] && row["ACC"] !== acc)
-                return false;
-
-            // Date filter
-            const date = row["Date"] || row["Order Date"];
-
-            if(start && date && date < start)
-                return false;
-
-            if(end && date && date > end)
-                return false;
-
-            return true;
-
-        });
+        filtered[sheet] = filterSheet(dataStore[sheet], sheet, filters);
 
     }
 
@@ -38,24 +19,53 @@ export function applyFilters(data){
 
 }
 
+function filterSheet(rows, sheetName, filters) {
 
-export function initFilterListeners(){
+    if (!rows) return [];
 
-    const filters = document.querySelectorAll(".filter-control");
+    return rows.filter(r => {
 
-    filters.forEach(f => {
+        if (!accountPass(r, filters)) return false;
 
-        f.addEventListener("change", handleFilterChange);
+        if (!datePass(r, sheetName, filters)) return false;
+
+        return true;
 
     });
 
 }
 
+function accountPass(row, filters) {
 
-function handleFilterChange(){
+    if (filters.ACC === "ALL") return true;
 
-    const filtered = applyFilters(dataStore);
+    if (!row.ACC) return true;
 
-    renderCurrentPage(filtered);
+    return row.ACC === filters.ACC;
+
+}
+
+function datePass(row, sheet, filters) {
+
+    let field = null;
+
+    if (sheet === "GMV") field = "Order Date";
+    if (sheet === "CDR") field = "Date";
+
+    if (!field) return true;
+
+    const raw = row[field];
+
+    if (!raw) return false;
+
+    const iso = parseDDMMYYYY(raw);
+
+    if (!iso) return false;
+
+    if (iso < filters.startDate) return false;
+
+    if (iso > filters.endDate) return false;
+
+    return true;
 
 }
