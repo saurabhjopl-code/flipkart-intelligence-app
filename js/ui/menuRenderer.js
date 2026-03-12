@@ -4,26 +4,60 @@ import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
 import { setPage, renderCurrentPage } from "../binder.js";
 
-let activeMenuItem = null;
+let activeItem = null;
 
 export function renderSidebar(){
 
     const sidebar = document.getElementById("sidebar");
     sidebar.innerHTML = "";
 
-    const title = document.createElement("div");
-    title.className = "sidebar-title";
-    title.innerText = "Flipkart Intelligence";
-
-    sidebar.appendChild(title);
+    sidebar.appendChild(title("Flipkart Intelligence"));
 
     sidebar.appendChild(menuItem("Home","HOME"));
 
-    sidebar.appendChild(menuItem("CDR","CDR"));
-    sidebar.appendChild(menuItem("CFR","CFR"));
-    sidebar.appendChild(menuItem("CKR","CKR"));
-    sidebar.appendChild(menuItem("PPR","PPR"));
-    sidebar.appendChild(menuItem("GMV","GMV"));
+    sidebar.appendChild(section("CDR",[
+        ["Campaign ROI","CDR_ROI"],
+        ["Campaign Spend Trend","CDR_SPEND"],
+        ["Campaign Efficiency","CDR_EFF"],
+        ["Budget Allocation","CDR_BUDGET"]
+    ]));
+
+    sidebar.appendChild(section("CFR",[
+        ["SKU ROI","CFR_SKU_ROI"],
+        ["Hero SKU","CFR_HERO"],
+        ["Ad Waste","CFR_WASTE"],
+        ["Ad Dependency","CFR_DEP"]
+    ]));
+
+    sidebar.appendChild(section("CKR",[
+        ["Keyword ROI","CKR_ROI"],
+        ["Keyword Efficiency","CKR_EFF"],
+        ["Keyword Opportunity","CKR_OPP"],
+        ["Negative Keywords","CKR_NEG"]
+    ]));
+
+    sidebar.appendChild(section("PPR",[
+        ["Placement ROI","PPR_ROI"],
+        ["Placement CTR","PPR_CTR"],
+        ["Placement Conversion","PPR_CONV"]
+    ]));
+
+    sidebar.appendChild(section("GMV",[
+        ["Hero Products","GMV_HERO"],
+        ["Category Performance","GMV_CAT"],
+        ["Return Risk","GMV_RETURN"],
+        ["Growth Momentum","GMV_GROWTH"]
+    ]));
+
+}
+
+function title(text){
+
+    const el = document.createElement("div");
+    el.className = "sidebar-title";
+    el.innerText = text;
+
+    return el;
 
 }
 
@@ -34,23 +68,64 @@ function menuItem(label,page){
     el.className = "sidebar-item";
     el.innerText = label;
 
-    el.onclick = () => {
+    el.onclick = () => navigate(page,el);
 
-        if(activeMenuItem)
-            activeMenuItem.style.background="";
+    return el;
 
-        el.style.background="#e9f2ff";
+}
 
-        activeMenuItem = el;
+function section(title,items){
 
-        setPage(page);
+    const wrapper = document.createElement("div");
 
-        const filtered = applyFilters(dataStore);
+    const header = document.createElement("div");
+    header.className = "sidebar-item";
+    header.innerText = title;
 
-        renderCurrentPage(filtered);
+    const submenu = document.createElement("div");
+    submenu.style.display = "none";
+
+    header.onclick = () => {
+
+        const open = submenu.style.display === "block";
+
+        submenu.style.display = open ? "none" : "block";
 
     };
 
-    return el;
+    items.forEach(i => {
+
+        const el = document.createElement("div");
+
+        el.className = "sidebar-item";
+        el.style.paddingLeft = "30px";
+        el.innerText = i[0];
+
+        el.onclick = () => navigate(i[1],el);
+
+        submenu.appendChild(el);
+
+    });
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(submenu);
+
+    return wrapper;
+
+}
+
+function navigate(page,el){
+
+    if(activeItem) activeItem.style.background = "";
+
+    el.style.background = "#e9f2ff";
+
+    activeItem = el;
+
+    setPage(page);
+
+    const filtered = applyFilters(dataStore);
+
+    renderCurrentPage(filtered);
 
 }
