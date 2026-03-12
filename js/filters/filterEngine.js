@@ -3,7 +3,7 @@
 import { dataStore } from "../core/dataStore.js";
 import { renderCurrentPage } from "../binder.js";
 
-function parseDDMMYYYY(dateStr){
+function parseDateDDMMYYYY(dateStr){
 
     if(!dateStr) return null;
 
@@ -25,8 +25,8 @@ export function applyFilters(data){
     const start = document.getElementById("filterStart")?.value;
     const end = document.getElementById("filterEnd")?.value;
 
-    const startDate = parseDDMMYYYY(start);
-    const endDate = parseDDMMYYYY(end);
+    const startDate = parseDateDDMMYYYY(start);
+    const endDate = parseDateDDMMYYYY(end);
 
     const filtered = {};
 
@@ -34,15 +34,15 @@ export function applyFilters(data){
 
         filtered[sheet] = data[sheet].filter(row => {
 
-            // Account filter
+            // account filter
             if(acc && acc !== "All Accounts" && row["ACC"] && row["ACC"] !== acc)
                 return false;
 
-            const dateStr = row["Date"] || row["Order Date"];
+            const rowDateStr = row["Date"] || row["Order Date"];
 
-            if(!dateStr) return true;
+            if(!rowDateStr) return true;
 
-            const rowDate = parseDDMMYYYY(dateStr);
+            const rowDate = parseDateDDMMYYYY(rowDateStr);
 
             if(startDate && rowDate < startDate) return false;
             if(endDate && rowDate > endDate) return false;
@@ -61,9 +61,9 @@ export function initFilterListeners(){
 
     const filters = document.querySelectorAll(".filter-control");
 
-    filters.forEach(el => {
+    filters.forEach(f => {
 
-        el.addEventListener("change", () => {
+        f.addEventListener("change", () => {
 
             const filtered = applyFilters(dataStore);
 
