@@ -13,15 +13,8 @@ export function renderFilterBar() {
 
     const acc = buildACCFilter();
     const range = buildRangeFilter();
-
-    const start = document.createElement("input");
-    start.type = "date";
-
-    const end = document.createElement("input");
-    end.type = "date";
-
-    start.onchange = () => updateDate(start.value, end.value);
-    end.onchange = () => updateDate(start.value, end.value);
+    const start = buildDate("Start Date");
+    const end = buildDate("End Date");
 
     bar.appendChild(acc);
     bar.appendChild(range);
@@ -32,13 +25,15 @@ export function renderFilterBar() {
 
 function buildACCFilter() {
 
+    const group = createGroup("Account");
+
     const select = document.createElement("select");
 
-    const opt = document.createElement("option");
-    opt.value = "ALL";
-    opt.text = "All Accounts";
+    const all = document.createElement("option");
+    all.value = "ALL";
+    all.text = "All Accounts";
 
-    select.appendChild(opt);
+    select.appendChild(all);
 
     const accs = new Set();
 
@@ -51,6 +46,7 @@ function buildACCFilter() {
     accs.forEach(a => {
 
         const o = document.createElement("option");
+
         o.value = a;
         o.text = a;
 
@@ -61,16 +57,19 @@ function buildACCFilter() {
     select.onchange = () => {
 
         setFilter("ACC", select.value);
-
         refresh();
 
     };
 
-    return select;
+    group.appendChild(select);
+
+    return group;
 
 }
 
 function buildRangeFilter() {
+
+    const group = createGroup("Time Range");
 
     const select = document.createElement("select");
 
@@ -99,21 +98,50 @@ function buildRangeFilter() {
     select.onchange = () => {
 
         applyRange(select.value);
-
         refresh();
 
     };
 
-    return select;
+    group.appendChild(select);
+
+    return group;
 
 }
 
-function updateDate(start, end) {
+function buildDate(labelText) {
 
-    setFilter("startDate", start);
-    setFilter("endDate", end);
+    const group = createGroup(labelText);
 
-    refresh();
+    const input = document.createElement("input");
+
+    input.type = "date";
+
+    input.onchange = () => {
+
+        setFilter(labelText === "Start Date" ? "startDate" : "endDate", input.value);
+        refresh();
+
+    };
+
+    group.appendChild(input);
+
+    return group;
+
+}
+
+function createGroup(labelText) {
+
+    const group = document.createElement("div");
+
+    group.className = "filter-group";
+
+    const label = document.createElement("label");
+
+    label.innerText = labelText;
+
+    group.appendChild(label);
+
+    return group;
 
 }
 
