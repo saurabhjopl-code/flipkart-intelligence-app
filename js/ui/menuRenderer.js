@@ -1,102 +1,109 @@
 // js/ui/menuRenderer.js
 
-import { renderHome, renderCampaignReport, renderSkuRoiReport } from "../binder.js";
 import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
+import { renderCurrentPage, currentPage } from "../binder.js";
 
-export function renderSidebar() {
+export function renderSidebar(){
 
-    const sidebar = document.getElementById("sidebar");
+    const sidebar=document.getElementById("sidebar");
+    sidebar.innerHTML="";
 
-    sidebar.innerHTML = "";
+    sidebar.appendChild(title("Flipkart Intelligence"));
 
-    const title = document.createElement("div");
-    title.className = "sidebar-title";
-    title.innerText = "Flipkart Intelligence";
+    sidebar.appendChild(item("Home","HOME"));
 
-    sidebar.appendChild(title);
-
-    const menu = document.createElement("div");
-    menu.className = "sidebar-menu";
-
-    menu.appendChild(buildItem("Home", () => {
-
-        const filtered = applyFilters(dataStore);
-        renderHome(filtered);
-
-    }));
-
-    menu.appendChild(buildSection("CDR", [
-
-        {
-            label: "Campaign ROI",
-            action: () => {
-
-                const filtered = applyFilters(dataStore);
-                renderCampaignReport(filtered);
-
-            }
-        }
-
+    sidebar.appendChild(section("CDR",[
+        ["Campaign ROI","CDR_ROI"],
+        ["Campaign Spend Trend","CDR_SPEND"],
+        ["Campaign Efficiency","CDR_EFF"],
+        ["Budget Allocation","CDR_BUDGET"]
     ]));
 
-    menu.appendChild(buildSection("CFR", [
-
-        {
-            label: "SKU ROI",
-            action: () => {
-
-                const filtered = applyFilters(dataStore);
-                renderSkuRoiReport(filtered);
-
-            }
-        }
-
+    sidebar.appendChild(section("CFR",[
+        ["SKU ROI","CFR_SKU_ROI"],
+        ["Hero SKU","CFR_HERO"],
+        ["Ad Waste","CFR_WASTE"],
+        ["Ad Dependency","CFR_DEP"]
     ]));
 
-    menu.appendChild(buildSection("CKR", []));
-    menu.appendChild(buildSection("PPR", []));
-    menu.appendChild(buildSection("GMV", []));
+    sidebar.appendChild(section("CKR",[
+        ["Keyword ROI","CKR_ROI"],
+        ["Keyword Efficiency","CKR_EFF"],
+        ["Keyword Opportunity","CKR_OPP"],
+        ["Negative Keywords","CKR_NEG"]
+    ]));
 
-    sidebar.appendChild(menu);
+    sidebar.appendChild(section("PPR",[
+        ["Placement ROI","PPR_ROI"],
+        ["Placement CTR","PPR_CTR"],
+        ["Placement Conversion","PPR_CONV"]
+    ]));
+
+    sidebar.appendChild(section("GMV",[
+        ["Hero Products","GMV_HERO"],
+        ["Category Performance","GMV_CAT"],
+        ["Return Risk","GMV_RETURN"],
+        ["Growth Momentum","GMV_GROWTH"]
+    ]));
 
 }
 
-function buildItem(label, action) {
+function title(text){
 
-    const el = document.createElement("div");
+    const el=document.createElement("div");
+    el.className="sidebar-title";
+    el.innerText=text;
+    return el;
 
-    el.className = "sidebar-item";
-    el.innerText = label;
+}
 
-    el.onclick = action;
+function item(label,page){
+
+    const el=document.createElement("div");
+    el.className="sidebar-item";
+    el.innerText=label;
+
+    el.onclick=()=>{
+
+        window.currentPage=page;
+
+        const filtered=applyFilters(dataStore);
+        renderCurrentPage(filtered);
+
+    };
 
     return el;
 
 }
 
-function buildSection(title, children) {
+function section(name,children){
 
-    const wrap = document.createElement("div");
+    const wrap=document.createElement("div");
 
-    const header = document.createElement("div");
-    header.className = "sidebar-item";
-    header.innerText = title;
+    const header=document.createElement("div");
+    header.className="sidebar-item";
+    header.innerText=name;
 
     wrap.appendChild(header);
 
-    children.forEach(child => {
+    children.forEach(c=>{
 
-        const sub = document.createElement("div");
+        const el=document.createElement("div");
+        el.className="sidebar-item";
+        el.style.paddingLeft="40px";
+        el.innerText=c[0];
 
-        sub.className = "sidebar-item";
-        sub.style.paddingLeft = "40px";
+        el.onclick=()=>{
 
-        sub.innerText = child.label;
+            window.currentPage=c[1];
 
-        sub.onclick = child.action;
+            const filtered=applyFilters(dataStore);
+            renderCurrentPage(filtered);
 
-        wrap.appendChild(sub);
+        };
+
+        wrap.appendChild(el);
 
     });
 
