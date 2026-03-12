@@ -12,9 +12,25 @@ import { buildCdrSpendRevenueChart } from "./charts/cdrSpendRevenueChart.js";
 
 import { buildCampaignRoiReport } from "./reports/cdr/campaignRoiReport.js";
 
+export let currentPage = "HOME";
 
+export function setPage(page) {
 
-export async function renderHome(data) {
+    currentPage = page;
+
+}
+
+export function renderCurrentPage(data) {
+
+    if (currentPage === "HOME") renderHome(data);
+
+    if (currentPage === "CDR") renderCampaignReport(data);
+
+}
+
+export function renderHome(data) {
+
+    currentPage = "HOME";
 
     const app = document.getElementById("app");
 
@@ -22,12 +38,8 @@ export async function renderHome(data) {
 
     const dashboard = document.createElement("div");
 
-
-
     const gmvCards = renderCardGrid(buildGmvSummary(data.GMV));
     dashboard.appendChild(gmvCards);
-
-
 
     const gmvChart = renderChartContainer(
         "GMV vs Net Sales",
@@ -37,12 +49,8 @@ export async function renderHome(data) {
 
     dashboard.appendChild(gmvChart);
 
-
-
     const adsCards = renderCardGrid(buildAdsSummary(data.CDR));
     dashboard.appendChild(adsCards);
-
-
 
     const adsChart = renderChartContainer(
         "Daily Ad Spend vs Ad Revenue",
@@ -52,15 +60,13 @@ export async function renderHome(data) {
 
     dashboard.appendChild(adsChart);
 
-
-
     app.appendChild(dashboard);
 
 }
 
-
-
 export function renderCampaignReport(data) {
+
+    currentPage = "CDR";
 
     const app = document.getElementById("app");
 
