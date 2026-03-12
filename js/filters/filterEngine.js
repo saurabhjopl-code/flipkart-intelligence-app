@@ -1,17 +1,55 @@
 // js/filters/filterEngine.js
 
-import { getFilters } from "./filterState.js";
-import { parseDDMMYYYY } from "../core/dateEngine.js";
+import { dataStore } from "../core/dataStore.js";
+import { renderCurrentPage } from "../binder.js";
 
-export function applyFilters(dataStore) {
+function parseDDMMYYYY(dateStr){
 
-    const filters = getFilters();
+    if(!dateStr) return null;
+
+    const parts = dateStr.split("/");
+
+    if(parts.length !== 3) return null;
+
+    const day = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const year = parseInt(parts[2]);
+
+    return new Date(year, month, day);
+
+}
+
+export function applyFilters(data){
+
+    const acc = document.getElementById("filterAcc")?.value;
+    const start = document.getElementById("filterStart")?.value;
+    const end = document.getElementById("filterEnd")?.value;
+
+    const startDate = parseDDMMYYYY(start);
+    const endDate = parseDDMMYYYY(end);
 
     const filtered = {};
 
-    for (const sheet in dataStore) {
+    for(const sheet in data){
 
-        filtered[sheet] = filterSheet(dataStore[sheet], sheet, filters);
+        filtered[sheet] = data[sheet].filter(row => {
+
+            // Account filter
+            if(acc && acc !== "All Accounts" && row["ACC"] && row["ACC"] !== acc)
+                return false;
+
+            const dateStr = row["Date"] || row["Order Date"];
+
+            if(!dateStr) return true;
+
+            const rowDate = parseDDMMYYYY(dateStr);
+
+            if(startDate && rowDate < startDate) return false;
+            if(endDate && rowDate > endDate) return false;
+
+            return true;
+
+        });
 
     }
 
@@ -19,53 +57,20 @@ export function applyFilters(dataStore) {
 
 }
 
-function filterSheet(rows, sheetName, filters) {
+export function initFilterListeners(){
 
-    if (!rows) return [];
+    const filters = document.querySelectorAll(".filter-control");
 
-    return rows.filter(r => {
+    filters.forEach(el => {
 
-        if (!accountPass(r, filters)) return false;
+        el.addEventListener("change", () => {
 
-        if (!datePass(r, sheetName, filters)) return false;
+            const filtered = applyFilters(dataStore);
 
-        return true;
+            renderCurrentPage(filtered);
+
+        });
 
     });
-
-}
-
-function accountPass(row, filters) {
-
-    if (filters.ACC === "ALL") return true;
-
-    if (!row.ACC) return true;
-
-    return row.ACC === filters.ACC;
-
-}
-
-function datePass(row, sheet, filters) {
-
-    let field = null;
-
-    if (sheet === "GMV") field = "Order Date";
-    if (sheet === "CDR") field = "Date";
-
-    if (!field) return true;
-
-    const raw = row[field];
-
-    if (!raw) return false;
-
-    const iso = parseDDMMYYYY(raw);
-
-    if (!iso) return false;
-
-    if (iso < filters.startDate) return false;
-
-    if (iso > filters.endDate) return false;
-
-    return true;
 
 }
