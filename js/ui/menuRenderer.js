@@ -1,8 +1,6 @@
-// js/ui/menuRenderer.js
-
 import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
-import { renderCurrentPage, currentPage } from "../binder.js";
+import { setPage, renderCurrentPage } from "../binder.js";
 
 export function renderSidebar(){
 
@@ -64,14 +62,7 @@ function item(label,page){
     el.className="sidebar-item";
     el.innerText=label;
 
-    el.onclick=()=>{
-
-        window.currentPage=page;
-
-        const filtered=applyFilters(dataStore);
-        renderCurrentPage(filtered);
-
-    };
+    el.onclick=()=>navigate(page);
 
     return el;
 
@@ -94,19 +85,22 @@ function section(name,children){
         el.style.paddingLeft="40px";
         el.innerText=c[0];
 
-        el.onclick=()=>{
-
-            window.currentPage=c[1];
-
-            const filtered=applyFilters(dataStore);
-            renderCurrentPage(filtered);
-
-        };
+        el.onclick=()=>navigate(c[1]);
 
         wrap.appendChild(el);
 
     });
 
     return wrap;
+
+}
+
+function navigate(page){
+
+    setPage(page);
+
+    const filtered=applyFilters(dataStore);
+
+    renderCurrentPage(filtered);
 
 }
