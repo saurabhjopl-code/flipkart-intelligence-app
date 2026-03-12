@@ -1,3 +1,5 @@
+// js/ui/menuRenderer.js
+
 import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
 import { setPage, renderCurrentPage } from "../binder.js";
@@ -47,14 +49,17 @@ export function renderSidebar(){
 
 }
 
+
 function title(text){
 
     const el=document.createElement("div");
     el.className="sidebar-title";
     el.innerText=text;
+
     return el;
 
 }
+
 
 function item(label,page){
 
@@ -68,32 +73,48 @@ function item(label,page){
 
 }
 
+
 function section(name,children){
 
     const wrap=document.createElement("div");
 
     const header=document.createElement("div");
-    header.className="sidebar-item";
-    header.innerText=name;
+    header.className="sidebar-item sidebar-section";
+    header.innerHTML=`${name} <span class="arrow">▶</span>`;
 
-    wrap.appendChild(header);
+    const container=document.createElement("div");
+    container.style.display="none";
+
+    header.onclick=()=>{
+
+        const open=container.style.display==="block";
+
+        container.style.display=open?"none":"block";
+
+        header.querySelector(".arrow").innerText=open?"▶":"▼";
+
+    };
 
     children.forEach(c=>{
 
         const el=document.createElement("div");
-        el.className="sidebar-item";
-        el.style.paddingLeft="40px";
+
+        el.className="sidebar-item submenu";
         el.innerText=c[0];
 
         el.onclick=()=>navigate(c[1]);
 
-        wrap.appendChild(el);
+        container.appendChild(el);
 
     });
+
+    wrap.appendChild(header);
+    wrap.appendChild(container);
 
     return wrap;
 
 }
+
 
 function navigate(page){
 
