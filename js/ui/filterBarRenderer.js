@@ -3,7 +3,7 @@
 import { dataStore } from "../core/dataStore.js";
 import { setFilter } from "../filters/filterState.js";
 import { applyFilters } from "../filters/filterEngine.js";
-import { renderHome } from "../binder.js";
+import { renderCurrentPage } from "../binder.js";
 
 export function renderFilterBar() {
 
@@ -11,8 +11,8 @@ export function renderFilterBar() {
 
     bar.innerHTML = "";
 
-    const accSelect = buildACCFilter();
-    const rangeSelect = buildRangeFilter();
+    const acc = buildACCFilter();
+    const range = buildRangeFilter();
 
     const start = document.createElement("input");
     start.type = "date";
@@ -23,8 +23,8 @@ export function renderFilterBar() {
     start.onchange = () => updateDate(start.value, end.value);
     end.onchange = () => updateDate(start.value, end.value);
 
-    bar.appendChild(accSelect);
-    bar.appendChild(rangeSelect);
+    bar.appendChild(acc);
+    bar.appendChild(range);
     bar.appendChild(start);
     bar.appendChild(end);
 
@@ -34,24 +34,25 @@ function buildACCFilter() {
 
     const select = document.createElement("select");
 
-    const values = new Set();
+    const opt = document.createElement("option");
+    opt.value = "ALL";
+    opt.text = "All Accounts";
+
+    select.appendChild(opt);
+
+    const accs = new Set();
 
     for (const r of dataStore.CDR) {
 
-        if (r.ACC) values.add(r.ACC);
+        if (r.ACC) accs.add(r.ACC);
 
     }
 
-    const optAll = document.createElement("option");
-    optAll.value = "ALL";
-    optAll.text = "All Accounts";
-    select.appendChild(optAll);
-
-    values.forEach(v => {
+    accs.forEach(a => {
 
         const o = document.createElement("option");
-        o.value = v;
-        o.text = v;
+        o.value = a;
+        o.text = a;
 
         select.appendChild(o);
 
@@ -73,32 +74,27 @@ function buildRangeFilter() {
 
     const select = document.createElement("select");
 
-    const ranges = [
-        "LAST_7",
-        "LAST_30",
-        "THIS_MONTH",
-        "LAST_MONTH"
-    ];
+    const ranges = {
 
-    const labels = {
-        LAST_7: "Last 7 Days",
-        LAST_30: "Last 30 Days",
+        LAST7: "Last 7 Days",
+        LAST30: "Last 30 Days",
         THIS_MONTH: "This Month",
         LAST_MONTH: "Last Month"
+
     };
 
-    ranges.forEach(r => {
+    for (const r in ranges) {
 
         const o = document.createElement("option");
 
         o.value = r;
-        o.text = labels[r];
-
-        if (r === "THIS_MONTH") o.selected = true;
+        o.text = ranges[r];
 
         select.appendChild(o);
 
-    });
+    }
+
+    select.value = "THIS_MONTH";
 
     select.onchange = () => {
 
@@ -109,42 +105,6 @@ function buildRangeFilter() {
     };
 
     return select;
-
-}
-
-function applyRange(range) {
-
-    const today = new Date();
-
-    let start = new Date();
-
-    if (range === "LAST_7") {
-
-        start.setDate(today.getDate() - 6);
-
-    }
-
-    if (range === "LAST_30") {
-
-        start.setDate(today.getDate() - 29);
-
-    }
-
-    if (range === "THIS_MONTH") {
-
-        start = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    }
-
-    if (range === "LAST_MONTH") {
-
-        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-        today.setDate(0);
-
-    }
-
-    setFilter("startDate", format(start));
-    setFilter("endDate", format(today));
 
 }
 
@@ -161,7 +121,35 @@ function refresh() {
 
     const filtered = applyFilters(dataStore);
 
-    renderHome(filtered);
+    renderCurrentPage(filtered);
+
+}
+
+function applyRange(range) {
+
+    const today = new Date();
+
+    let start = new Date();
+
+    if (range === "LAST7") start.setDate(today.getDate() - 6);
+
+    if (range === "LAST30") start.setDate(today.getDate() - 29);
+
+    if (range === "THIS_MONTH") {
+
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    }
+
+    if (range === "LAST_MONTH") {
+
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        today.setDate(0);
+
+    }
+
+    setFilter("startDate", format(start));
+    setFilter("endDate", format(today));
 
 }
 
