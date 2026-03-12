@@ -139,10 +139,16 @@ export function renderHome(data){
 
 }
 
-function renderTablePage(report){
+function renderTablePage(report, title){
 
     const app=document.getElementById("app");
     app.innerHTML="";
+
+    const h=document.createElement("h2");
+    h.innerText=title;
+    h.style.margin="10px 0 16px 0";
+
+    app.appendChild(h);
 
     const table=renderTable(report.columns,report.rows);
 
