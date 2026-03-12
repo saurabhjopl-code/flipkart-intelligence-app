@@ -1,25 +1,31 @@
+// js/filters/filterEngine.js
+
 import { dataStore } from "../core/dataStore.js";
 import { renderCurrentPage } from "../binder.js";
 
 export function applyFilters(data){
 
-    const acc=document.getElementById("filterAcc")?.value;
-    const start=document.getElementById("filterStart")?.value;
-    const end=document.getElementById("filterEnd")?.value;
+    const acc = document.getElementById("filterAcc")?.value;
+    const start = document.getElementById("filterStart")?.value;
+    const end = document.getElementById("filterEnd")?.value;
 
-    const filtered={};
+    const filtered = {};
 
     for(const sheet in data){
 
-        filtered[sheet]=data[sheet].filter(r=>{
+        filtered[sheet] = data[sheet].filter(row => {
 
-            if(acc && acc!=="All Accounts" && r["ACC"] && r["ACC"]!==acc)
+            // Account filter
+            if(acc && acc !== "All Accounts" && row["ACC"] && row["ACC"] !== acc)
                 return false;
 
-            if(start && r["Date"] && r["Date"]<start)
+            // Date filter
+            const date = row["Date"] || row["Order Date"];
+
+            if(start && date && date < start)
                 return false;
 
-            if(end && r["Date"] && r["Date"]>end)
+            if(end && date && date > end)
                 return false;
 
             return true;
@@ -32,20 +38,24 @@ export function applyFilters(data){
 
 }
 
+
 export function initFilterListeners(){
 
-    const filters=document.querySelectorAll(".filter-control");
+    const filters = document.querySelectorAll(".filter-control");
 
-    filters.forEach(f=>{
+    filters.forEach(f => {
 
-        f.addEventListener("change",()=>{
-
-            const filtered=applyFilters(dataStore);
-
-            renderCurrentPage(filtered);
-
-        });
+        f.addEventListener("change", handleFilterChange);
 
     });
+
+}
+
+
+function handleFilterChange(){
+
+    const filtered = applyFilters(dataStore);
+
+    renderCurrentPage(filtered);
 
 }
