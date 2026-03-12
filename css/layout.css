@@ -1,1 +1,36 @@
-// Placeholder file for layout.css
+body {
+    font-family: system-ui, -apple-system, Arial;
+    background: #f6f8fb;
+}
+
+.app-layout {
+    display: flex;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 220px;
+    background: white;
+    border-right: 1px solid #e4e7ec;
+}
+
+.main-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#filter-bar {
+    height: 64px;
+    background: white;
+    border-bottom: 1px solid #e4e7ec;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+#app {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
