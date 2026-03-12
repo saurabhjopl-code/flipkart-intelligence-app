@@ -108,7 +108,7 @@ export function renderCurrentPage(data) {
 
 }
 
-function renderHome(data){
+export function renderHome(data){
 
     const app=document.getElementById("app");
     app.innerHTML="";
