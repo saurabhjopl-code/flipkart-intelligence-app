@@ -1,59 +1,48 @@
-// js/reports/cdr/budgetAllocationReport.js
+export function buildBudgetAllocationReport(rows){
 
-import { formatCurrency } from "../../core/formatter.js";
+    const map={};
+    let total=0;
 
-export function buildBudgetAllocationReport(rows) {
+    rows.forEach(r=>{
 
-    const map = {};
+        const campaign=r["Campaign Name"];
+        const spend=Number(r["Ad Spend"]||0);
 
-    let totalSpend = 0;
+        total+=spend;
 
-    for (const r of rows) {
+        if(!map[campaign]) map[campaign]=0;
 
-        const campaign = r["Campaign Name"];
-        const spend = Number(r["Ad Spend"] || 0);
+        map[campaign]+=spend;
 
-        totalSpend += spend;
+    });
 
-        if (!map[campaign]) map[campaign] = 0;
+    const out=[];
 
-        map[campaign] += spend;
+    for(const c in map){
 
-    }
+        const spend=map[c];
 
-    const out = [];
-
-    for (const campaign in map) {
-
-        const spend = map[campaign];
-
-        const share = totalSpend > 0
-            ? (spend / totalSpend) * 100
-            : 0;
+        const share=total>0?(spend/total*100):0;
 
         out.push({
-
-            campaign,
-            spend: formatCurrency(spend),
-            share: share.toFixed(2) + "%"
-
+            campaign:c,
+            spend:spend,
+            share:share.toFixed(2)+"%"
         });
 
     }
 
-    out.sort((a, b) => b.share - a.share);
+    out.sort((a,b)=>b.spend-a.spend);
 
-    return {
+    return{
 
-        columns: [
-
-            { key: "campaign", label: "Campaign" },
-            { key: "spend", label: "Ad Spend" },
-            { key: "share", label: "Spend Share" }
-
+        columns:[
+            {key:"campaign",label:"Campaign"},
+            {key:"spend",label:"Ad Spend"},
+            {key:"share",label:"Spend Share"}
         ],
 
-        rows: out
+        rows:out
 
     };
 
