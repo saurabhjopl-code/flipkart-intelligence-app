@@ -8,18 +8,28 @@ export function parseDDMMYYYY(dateStr) {
 
     if (parts.length !== 3) return null;
 
-    const day = parts[0];
-    const month = parts[1];
+    const day = parts[0].padStart(2, "0");
+    const month = parts[1].padStart(2, "0");
     const year = parts[2];
 
     return `${year}-${month}-${day}`;
+
 }
 
-export function toDateObject(dateStr) {
+export function todayISO() {
 
-    const iso = parseDDMMYYYY(dateStr);
+    const d = new Date();
 
-    if (!iso) return null;
+    return formatDate(d);
 
-    return new Date(iso);
+}
+
+export function formatDate(date) {
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+
+    return `${y}-${m}-${d}`;
+
 }
