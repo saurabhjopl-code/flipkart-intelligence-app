@@ -1,3 +1,5 @@
+// js/binder.js
+
 import { renderCardGrid } from "./ui/cardRenderer.js";
 import { renderChartContainer } from "./ui/chartContainer.js";
 import { renderTable } from "./ui/tableRenderer.js";
@@ -36,84 +38,103 @@ import { buildSkuIntelligence } from "./core/skuIntelligenceEngine.js";
 
 let currentPage = "HOME";
 
-export function setPage(page) {
+export function setPage(page){
     currentPage = page;
 }
 
-export function renderCurrentPage(data) {
+export function renderCurrentPage(data){
 
     switch(currentPage){
 
         case "HOME":
-            renderHome(data); break;
+            renderHome(data);
+            break;
 
         case "CDR_ROI":
-            renderTablePage(buildCampaignRoiReport(data.CDR)); break;
+            renderTablePage(buildCampaignRoiReport(data.CDR),"Campaign ROI");
+            break;
 
         case "CDR_SPEND":
-            renderTablePage(buildCampaignSpendTrend(data.CDR)); break;
+            renderTablePage(buildCampaignSpendTrend(data.CDR),"Campaign Spend Trend");
+            break;
 
         case "CDR_EFF":
-            renderTablePage(buildCampaignEfficiencyReport(data.CDR)); break;
+            renderTablePage(buildCampaignEfficiencyReport(data.CDR),"Campaign Efficiency");
+            break;
 
         case "CDR_BUDGET":
-            renderTablePage(buildBudgetAllocationReport(data.CDR)); break;
+            renderTablePage(buildBudgetAllocationReport(data.CDR),"Budget Allocation");
+            break;
 
         case "CFR_SKU_ROI":
-            renderTablePage(buildSkuRoiReport(buildSkuIntelligence(data))); break;
+            renderTablePage(buildSkuRoiReport(buildSkuIntelligence(data)),"SKU ROI");
+            break;
 
         case "CFR_HERO":
-            renderTablePage(buildHeroSkuReport(buildSkuIntelligence(data))); break;
+            renderTablePage(buildHeroSkuReport(buildSkuIntelligence(data)),"Hero SKU");
+            break;
 
         case "CFR_WASTE":
-            renderTablePage(buildAdWasteReport(buildSkuIntelligence(data))); break;
+            renderTablePage(buildAdWasteReport(buildSkuIntelligence(data)),"Ad Waste");
+            break;
 
         case "CFR_DEP":
-            renderTablePage(buildAdDependencyReport(buildSkuIntelligence(data))); break;
+            renderTablePage(buildAdDependencyReport(buildSkuIntelligence(data)),"Ad Dependency");
+            break;
 
         case "CKR_ROI":
-            renderTablePage(buildKeywordRoiReport(data.CKR)); break;
+            renderTablePage(buildKeywordRoiReport(data.CKR),"Keyword ROI");
+            break;
 
         case "CKR_EFF":
-            renderTablePage(buildKeywordEfficiencyReport(data.CKR)); break;
+            renderTablePage(buildKeywordEfficiencyReport(data.CKR),"Keyword Efficiency");
+            break;
 
         case "CKR_OPP":
-            renderTablePage(buildKeywordOpportunityReport(data.CKR)); break;
+            renderTablePage(buildKeywordOpportunityReport(data.CKR),"Keyword Opportunity");
+            break;
 
         case "CKR_NEG":
-            renderTablePage(buildNegativeKeywordReport(data.CKR)); break;
+            renderTablePage(buildNegativeKeywordReport(data.CKR),"Negative Keywords");
+            break;
 
         case "PPR_ROI":
-            renderTablePage(buildPlacementRoiReport(data.PPR)); break;
+            renderTablePage(buildPlacementRoiReport(data.PPR),"Placement ROI");
+            break;
 
         case "PPR_CTR":
-            renderTablePage(buildPlacementCtrReport(data.PPR)); break;
+            renderTablePage(buildPlacementCtrReport(data.PPR),"Placement CTR");
+            break;
 
         case "PPR_CONV":
-            renderTablePage(buildPlacementConversionReport(data.PPR)); break;
+            renderTablePage(buildPlacementConversionReport(data.PPR),"Placement Conversion");
+            break;
 
         case "GMV_HERO":
-            renderTablePage(buildHeroProductReport(data.GMV)); break;
+            renderTablePage(buildHeroProductReport(data.GMV),"Hero Products");
+            break;
 
         case "GMV_CAT":
-            renderTablePage(buildCategoryPerformanceReport(data.GMV)); break;
+            renderTablePage(buildCategoryPerformanceReport(data.GMV),"Category Performance");
+            break;
 
         case "GMV_RETURN":
-            renderTablePage(buildReturnRiskReport(data.GMV)); break;
+            renderTablePage(buildReturnRiskReport(data.GMV),"Return Risk");
+            break;
 
         case "GMV_GROWTH":
-            renderTablePage(buildGrowthMomentumReport(data.GMV)); break;
-
+            renderTablePage(buildGrowthMomentumReport(data.GMV),"Growth Momentum");
+            break;
     }
 
 }
 
 export function renderHome(data){
 
-    const app=document.getElementById("app");
-    app.innerHTML="";
+    const app = document.getElementById("app");
+    app.innerHTML = "";
 
-    const dashboard=document.createElement("div");
+    const dashboard = document.createElement("div");
 
     dashboard.appendChild(renderCardGrid(buildGmvSummary(data.GMV)));
 
@@ -139,18 +160,18 @@ export function renderHome(data){
 
 }
 
-function renderTablePage(report, title){
+function renderTablePage(report,title){
 
-    const app=document.getElementById("app");
-    app.innerHTML="";
+    const app = document.getElementById("app");
+    app.innerHTML = "";
 
-    const h=document.createElement("h2");
-    h.innerText=title;
-    h.style.margin="10px 0 16px 0";
+    const h = document.createElement("h2");
+    h.innerText = title;
+    h.style.margin = "10px 0 16px";
 
     app.appendChild(h);
 
-    const table=renderTable(report.columns,report.rows);
+    const table = renderTable(report.columns,report.rows);
 
     app.appendChild(table);
 
