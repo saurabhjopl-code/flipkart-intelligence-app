@@ -1,59 +1,39 @@
-// js/reports/cdr/campaignSpendTrendReport.js
+export function buildCampaignSpendTrend(rows){
 
-import { formatCurrency } from "../../core/formatter.js";
+    const map={};
 
-export function buildCampaignSpendTrendReport(rows) {
+    rows.forEach(r=>{
 
-    const map = {};
+        const campaign=r["Campaign Name"];
+        const spend=Number(r["Ad Spend"]||0);
 
-    for (const r of rows) {
+        if(!map[campaign]) map[campaign]=0;
 
-        const campaign = r["Campaign Name"];
+        map[campaign]+=spend;
 
-        if (!map[campaign]) {
+    });
 
-            map[campaign] = {
-                spend: 0,
-                revenue: 0
-            };
+    const out=[];
 
-        }
-
-        map[campaign].spend += Number(r["Ad Spend"] || 0);
-        map[campaign].revenue += Number(r["Total Revenue (Rs.)"] || 0);
-
-    }
-
-    const out = [];
-
-    for (const campaign in map) {
-
-        const spend = map[campaign].spend;
-        const revenue = map[campaign].revenue;
+    for(const c in map){
 
         out.push({
-
-            campaign,
-            spend: formatCurrency(spend),
-            revenue: formatCurrency(revenue)
-
+            campaign:c,
+            spend:map[c]
         });
 
     }
 
-    out.sort((a, b) => b.spend - a.spend);
+    out.sort((a,b)=>b.spend-a.spend);
 
-    return {
+    return{
 
-        columns: [
-
-            { key: "campaign", label: "Campaign" },
-            { key: "spend", label: "Ad Spend" },
-            { key: "revenue", label: "Revenue" }
-
+        columns:[
+            {key:"campaign",label:"Campaign"},
+            {key:"spend",label:"Ad Spend"}
         ],
 
-        rows: out
+        rows:out
 
     };
 
