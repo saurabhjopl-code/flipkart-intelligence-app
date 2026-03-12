@@ -1,5 +1,3 @@
-// js/ui/menuRenderer.js
-
 import { dataStore } from "../core/dataStore.js";
 import { applyFilters } from "../filters/filterEngine.js";
 import { setPage, renderCurrentPage } from "../binder.js";
@@ -12,8 +10,6 @@ export function renderSidebar(){
     sidebar.innerHTML = "";
 
     sidebar.appendChild(title("Flipkart Intelligence"));
-
-    sidebar.appendChild(menuItem("Home","HOME"));
 
     sidebar.appendChild(section("CDR",[
         ["Campaign ROI","CDR_ROI"],
@@ -36,19 +32,6 @@ export function renderSidebar(){
         ["Negative Keywords","CKR_NEG"]
     ]));
 
-    sidebar.appendChild(section("PPR",[
-        ["Placement ROI","PPR_ROI"],
-        ["Placement CTR","PPR_CTR"],
-        ["Placement Conversion","PPR_CONV"]
-    ]));
-
-    sidebar.appendChild(section("GMV",[
-        ["Hero Products","GMV_HERO"],
-        ["Category Performance","GMV_CAT"],
-        ["Return Risk","GMV_RETURN"],
-        ["Growth Momentum","GMV_GROWTH"]
-    ]));
-
 }
 
 function title(text){
@@ -61,42 +44,31 @@ function title(text){
 
 }
 
-function menuItem(label,page){
-
-    const el = document.createElement("div");
-
-    el.className = "sidebar-item";
-    el.innerText = label;
-
-    el.onclick = () => navigate(page,el);
-
-    return el;
-
-}
-
-function section(title,items){
+function section(name,items){
 
     const wrapper = document.createElement("div");
 
     const header = document.createElement("div");
     header.className = "sidebar-item";
-    header.innerText = title;
+    header.innerText = name;
 
     const submenu = document.createElement("div");
     submenu.style.display = "none";
 
     header.onclick = () => {
 
-        const open = submenu.style.display === "block";
+        document.querySelectorAll(".sidebar-submenu")
+            .forEach(s => s.style.display = "none");
 
-        submenu.style.display = open ? "none" : "block";
+        submenu.style.display = "block";
 
     };
+
+    submenu.className = "sidebar-submenu";
 
     items.forEach(i => {
 
         const el = document.createElement("div");
-
         el.className = "sidebar-item";
         el.style.paddingLeft = "30px";
         el.innerText = i[0];
@@ -116,9 +88,9 @@ function section(title,items){
 
 function navigate(page,el){
 
-    if(activeItem) activeItem.style.background = "";
+    if(activeItem) activeItem.style.background="";
 
-    el.style.background = "#e9f2ff";
+    el.style.background="#e9f2ff";
 
     activeItem = el;
 
