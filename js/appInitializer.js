@@ -32,6 +32,7 @@ export async function startApp() {
 
         // STEP 3 — Render filter UI
         renderFilterBar();
+        initFilterListeners();
 
         // STEP 4 — Attach filter listeners
         initFilterListeners();
