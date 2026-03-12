@@ -1,5 +1,3 @@
-// js/binder.js
-
 import { renderCardGrid } from "./ui/cardRenderer.js";
 import { renderChartContainer } from "./ui/chartContainer.js";
 import { renderTable } from "./ui/tableRenderer.js";
@@ -36,9 +34,13 @@ import { buildGrowthMomentumReport } from "./reports/gmv/growthMomentumReport.js
 
 import { buildSkuIntelligence } from "./core/skuIntelligenceEngine.js";
 
-export let currentPage = "HOME";
+let currentPage = "HOME";
 
-export function renderCurrentPage(data){
+export function setPage(page) {
+    currentPage = page;
+}
+
+export function renderCurrentPage(data) {
 
     switch(currentPage){
 
@@ -106,9 +108,7 @@ export function renderCurrentPage(data){
 
 }
 
-export function renderHome(data){
-
-    currentPage="HOME";
+function renderHome(data){
 
     const app=document.getElementById("app");
     app.innerHTML="";
