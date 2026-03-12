@@ -1,32 +1,19 @@
-// js/filters/filterEngine.js
-
 import { dataStore } from "../core/dataStore.js";
 import { renderCurrentPage } from "../binder.js";
 
-function parseDateDDMMYYYY(dateStr){
+function parseDate(dateStr){
 
     if(!dateStr) return null;
 
-    const parts = dateStr.split("/");
+    const [d,m,y] = dateStr.split("/");
 
-    if(parts.length !== 3) return null;
-
-    const day = parseInt(parts[0]);
-    const month = parseInt(parts[1]) - 1;
-    const year = parseInt(parts[2]);
-
-    return new Date(year, month, day);
+    return new Date(y,m-1,d);
 
 }
 
 export function applyFilters(data){
 
     const acc = document.getElementById("filterAcc")?.value;
-    const start = document.getElementById("filterStart")?.value;
-    const end = document.getElementById("filterEnd")?.value;
-
-    const startDate = parseDateDDMMYYYY(start);
-    const endDate = parseDateDDMMYYYY(end);
 
     const filtered = {};
 
@@ -34,18 +21,8 @@ export function applyFilters(data){
 
         filtered[sheet] = data[sheet].filter(row => {
 
-            // account filter
             if(acc && acc !== "All Accounts" && row["ACC"] && row["ACC"] !== acc)
                 return false;
-
-            const rowDateStr = row["Date"] || row["Order Date"];
-
-            if(!rowDateStr) return true;
-
-            const rowDate = parseDateDDMMYYYY(rowDateStr);
-
-            if(startDate && rowDate < startDate) return false;
-            if(endDate && rowDate > endDate) return false;
 
             return true;
 
